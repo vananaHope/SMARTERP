@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.PrmDao">
+	<select id="prm_getStoreName" parameterType="prm" resultType="prm">
+		SELECT store_num, store_name FROM store
+		WHERE store_name LIKE '%'||#{store_name}||'%'
+		ORDER BY store_num
+	</select>
+	
+	<select id="prm_empList" resultType="prm">
+		SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+				e.phone_num, e.hire_date, e.resignation_day	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM
+		ORDER BY e.resignation_day desc, e.employee_num 
+	</select>
+	
+	<select id="empDetail" parameterType="int" resultType="prm">
+		SELECT e.employee_num, e.employee_name, s.store_num, s.store_name, e.id, e.email, e.job_level, 
+				e.hire_date, e.hire_type, e.resignation_day, e.phone_num, e.employee_photo, e.auth 	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.store_num
+		AND e.employee_num=#{employee_num}
+	</select>
+	
+	<select id="myInfoDetail" parameterType="int" resultType="prm">
+		SELECT e.employee_num, e.employee_name, s.store_num, s.store_name, e.id, e.email, e.job_level, 
+				e.hire_date, e.hire_type, e.resignation_day, e.phone_num, e.employee_photo, e.auth 	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.store_num
+		AND e.employee_num=#{employee_num}
+	</select>
+	
+	<insert id="insertEmployee" parameterType="prm">
+		INSERT INTO EMPLOYEE (employee_num, store_num, employee_name, id, password, email, phone_num, job_level, hire_date, hire_type, auth) 
+		VALUES (#{employee_num}, #{store_num}, #{employee_name}, #{id}, #{password}, #{email},
+				#{phone_num}, #{job_level}, #{hire_date}, #{hire_type}, #{auth})
+	</insert>
+	<select id="schSeq">
+		SELECT emp_seq.nextval FROM dual
+	</select>
+	
+	<update id="updatePhoto" parameterType="prm">
+		update employee set employee_photo = #{employee_photo}
+		where employee_num = #{employee_num} and employee_name = #{employee_name}
+	</update>
+	
+	<select id="schStorekeeper" parameterType="prm" resultType="prm">
+		SELECT job_level, employee_num, store_num, auth, hire_type
+		FROM employee WHERE store_num=#{store_num} AND job_level='점주' AND auth=2
+	</select>
+	
+	<update id="uptEmployee" parameterType="prm">
+		update employee set store_num= #{store_num}, employee_name = #{employee_name},
+		email = #{email}, phone_num = #{phone_num}, job_level = #{job_level}, 
+		hire_date = #{hire_date}, hire_type = #{hire_type}, resignation_day = #{resignation_day}, auth = #{auth}
+		where employee_num = #{employee_num}
+	</update>
+	
+	<update id="uptEmployee_Rd" parameterType="prm">
+		update employee set store_num= #{store_num}, employee_name = #{employee_name}, password = #{password},
+		email = #{email}, phone_num = #{phone_num}, job_level = #{job_level},  
+		hire_date = #{hire_date}, hire_type = #{hire_type}, resignation_day = #{resignation_day}, auth = #{auth}
+		where employee_num = #{employee_num}
+	</update>
+	
+	<delete id="delEmployee" parameterType="prm">
+		DELETE FROM employee WHERE employee_num=#{employee_num} and
+		 employee_name=#{employee_name} and resignation_day=#{resignation_day}
+	</delete>
+	
+	<update id="uptPass" parameterType="prm">
+		UPDATE employee SET password = #{password} WHERE EMPLOYEE_NUM = #{employee_num}
+	</update>
+	
+	<!-- 직원 번호 검색 -->
+	<select id="schEmp_num" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+				SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+						e.phone_num, e.hire_date, e.resignation_day	
+				FROM EMPLOYEE e, STORE s 
+				WHERE e.store_num = s.store_num 
+				AND employee_num LIKE '%'||#{schWord}||'%'
+				ORDER BY e.resignation_day desc, e.employee_num
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 직원 이름 검색 -->
+	<select id="schEmp_name" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+				SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+						e.phone_num, e.hire_date, e.resignation_day	
+				FROM EMPLOYEE e, STORE s 
+				WHERE e.store_num = s.store_num 
+				AND UPPER(employee_name) LIKE UPPER('%'||#{schWord}||'%')
+				ORDER BY e.resignation_day desc, e.employee_name
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 점포 이름 검색 -->
+	<select id="schStore_name" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+					SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+							e.phone_num, e.hire_date, e.resignation_day	
+					FROM EMPLOYEE e, STORE s 
+					WHERE e.store_num = s.store_num 
+					AND s.store_name LIKE '%'||#{schWord}||'%'
+					ORDER BY e.resignation_day DESC, e.store_num, auth, e.employee_name
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 직위 검색 -->
+	<select id="schJob_level" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+					SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+							e.phone_num, e.hire_date, e.resignation_day	
+					FROM EMPLOYEE e, STORE s 
+					WHERE e.store_num = s.store_num 
+					AND job_level LIKE '%'||#{schWord}||'%'
+					ORDER BY e.resignation_day desc,  auth, e.store_num, e.employee_num
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 전화 번호 검색 -->
+	<select id="schPhone_num" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+					SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+							e.phone_num, e.hire_date, e.resignation_day	
+					FROM EMPLOYEE e, STORE s 
+					WHERE e.store_num = s.store_num 
+					AND phone_num LIKE '%'||#{schWord}||'%'
+					ORDER BY e.resignation_day desc, phone_num,  e.employee_name
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 입사일 년도 검색 -->
+	<select id="schHire_date_year" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+		    SELECT rownum cnt, a.* FROM (
+		        SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+		                e.phone_num, e.hire_date, e.resignation_day    
+		        FROM EMPLOYEE e, STORE s 
+		        WHERE e.store_num = s.STORE_NUM 
+		        AND EXTRACT(YEAR FROM hire_date) = #{schWord}
+		        ORDER BY resignation_day DESC, hire_date DESC, employee_num DESC
+		    ) a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 입사일 검색 -->
+	<select id="schHire_date" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+				SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+						e.phone_num, e.hire_date, e.resignation_day	
+				FROM EMPLOYEE e, STORE s 
+				WHERE e.store_num = s.STORE_NUM 
+				AND to_char(hire_date,'YYYY-MM-DD') LIKE '%'||#{schWord}||'%'
+				ORDER BY resignation_day DESC, hire_date DESC, employee_num Desc
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 퇴사일 년도 검색 -->
+	<select id="schResignation_day_year" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+				SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+						e.phone_num, e.hire_date, e.resignation_day	
+				FROM EMPLOYEE e, STORE s 
+				WHERE e.store_num = s.STORE_NUM 
+				AND EXTRACT(YEAR FROM resignation_day) = #{schWord}
+				ORDER BY resignation_day DESC, employee_name
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	
+	<!-- 퇴사일 검색 -->
+	<select id="schResignation_day" parameterType="prmsch" resultType="prm">
+		SELECT * FROM (
+			SELECT rownum cnt, a.* FROM (
+				SELECT e.employee_num, e.employee_name, s.store_name, e.job_level, 
+						e.phone_num, e.hire_date, e.resignation_day	
+				FROM EMPLOYEE e, STORE s 
+				WHERE e.store_num = s.STORE_NUM 
+				AND to_char(resignation_day,'YYYY-MM-DD') LIKE '%'||#{schWord}||'%'
+				ORDER BY resignation_day DESC, employee_name
+			)a
+		) WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 직원 번호 검색 개수 -->
+	<select id="schCountEnum" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND employee_num LIKE '%'||#{schWord}||'%'
+	</select>
+	<!-- 직원 이름 검색 개수 -->
+	<select id="schCountEname" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND UPPER(employee_name) LIKE UPPER('%'||#{schWord}||'%')
+	</select>
+	<!-- 점포 이름 검색 개수 -->
+	<select id="schCountSname" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND store_name LIKE '%'||#{schWord}||'%'
+	</select>
+	<!-- 직위 검색 개수 -->
+	<select id="schCountJob" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND job_level LIKE '%'||#{schWord}||'%'
+	</select>
+	<!-- 전화 번호 검색 개수 -->
+	<select id="schCountPnum" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND phone_num LIKE '%'||#{schWord}||'%'
+	</select>
+	
+	<!-- 입사일 년도 검색 개수-->
+	<select id="schCountHd_year" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND EXTRACT(YEAR FROM hire_date) = #{schWord}
+	</select>
+	
+	<!-- 입사일 검색 개수 -->
+	<select id="schCountHd" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND to_char(hire_date,'YYYY-MM-DD') LIKE '%'||#{schWord}||'%'
+	</select>
+	
+	<!-- 퇴사일 년도 검색 개수-->
+	<select id="schCountRd_year" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND EXTRACT(YEAR FROM resignation_day) = #{schWord}
+	</select>
+	
+	<!-- 퇴사일 검색 개수 -->
+	<select id="schCountRd" parameterType="prmsch" resultType="int">
+		SELECT count(*)	
+		FROM EMPLOYEE e, STORE s 
+		WHERE e.store_num = s.STORE_NUM 
+		AND to_char(resignation_day,'YYYY-MM-DD') LIKE '%'||#{schWord}||'%'
+	</select>
+	
+	
+	
+</mapper>	

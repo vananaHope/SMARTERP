@@ -1,0 +1,68 @@
+@charset "UTF-8";
+
+label.error {
+    color: red;
+    display: block;
+    font-size: 5px;
+}
+
+.row-no span {
+	width: 140px;
+}
+
+.tab-no{
+	width: 100%;
+	color: black;
+	border-collapse: collapse;
+	flex: auto;
+}
+.tab-no th {
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+}
+.tab-no td {
+    padding-top: 20px;
+    font-size: 15px;
+    text-align: center;
+}
+.tab-no .bottLine{
+	border-bottom: 2px solid gray;
+}
+.tab-no .search{
+	width: 80%;
+	height: 95%;
+	border: 2px solid lightgray;
+	border-radius: 7px;
+	margin: 5px 0 2px 20%;
+	text-align: right;
+	padding-right: 20px;
+}
+.tab-no select{
+	width: 100%;
+	border: 2px solid gray;
+	border-radius: 7px;
+	margin: 2px 5px 2px 5px;
+	text-align: center;
+}
+.btnArea-dong{
+	text-align: right;
+}
+.tab-no .btn{
+	padding: 0.375rem 2rem;
+	width:90%;
+	font-weight: bold;
+}
+.tab-no .flRight{
+	float:right;
+	width:50%;
+	margin: 0 0.75rem 0.25rem 0;
+}
+
+#apvModal span {
+	width: 120px;
+}
+
+#orderModal span {
+	width: 120px;
+}

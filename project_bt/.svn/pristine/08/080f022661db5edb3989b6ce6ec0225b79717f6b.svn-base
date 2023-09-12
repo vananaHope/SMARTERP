@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.StoreStorageDao">
+<!-- 점포 창고 조회 -->
+<select id = "schStoreStorage" resultType = "ss" parameterType = "int">
+	SELECT
+   hop.PRODUCT_NUM,
+    hop.brand,
+    hop.ITEM_NAME,
+    hop.COLOR as color,
+    hop.sizee,
+    hop.COST,
+    ss.STORAGE_COUNT,
+    hop.PROPERTIES_NUM,
+    hop.ITEM_NUM
+FROM STORE_STORAGE ss,
+   (SELECT h.PRODUCT_NUM ,b.*,c.*,h.COST  
+   FROM HEAD_OFFICE_PRODUCT h,
+      (SELECT bi.ITEM_NUM,bi2.ITEM_NAME brand,bi.ITEM_NAME
+      FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+      WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+      (SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZEE" 
+      FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+      WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+   WHERE h.ITEM_NUM = b.item_num
+   AND h.PROPERTIES_NUM = c.properties_num) hop, store s
+WHERE hop.product_num = ss.PRODUCT_NUM 
+AND ss.STORE_NUM = s.store_num
+AND s.store_num = #{store_num}
+</select>
+
+
+<!-- 점포에 등록된 상품 제거 -->
+<delete id = "delSsPrd" parameterType = "int">
+	DELETE FROM STORE_STORAGE 
+	WHERE PRODUCT_NUM = #{product_num}
+</delete>
+
+<!-- 점포에 등록된 상품 재고 업데이트 -->
+<update id = "uptSsPrd" parameterType = "ss">
+	UPDATE STORE_STORAGE SET STORAGE_COUNT = #{storage_count} 
+	WHERE PRODUCT_NUM  = #{product_num}
+</update>
+
+
+</mapper>	

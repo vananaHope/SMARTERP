@@ -1,0 +1,154 @@
+ .col-hak{
+	width: 100%;
+	height: 100%;
+}
+.tab-hak{
+	width: 100%;
+	color: gray;
+	border-collapse: collapse;
+	text-align:center;
+}
+#pageSize{
+	width:20px;
+	margin:1px;
+}
+.select {
+  width: 90px;
+  height: 30px;
+  border: 0 none;
+  outline: 0 none;
+  padding: 0 5px;
+  z-index: 3;
+  border-radius: 7px;
+  border: 2px solid #808080;
+  color:#808080;
+  font-size:14px;
+}
+.select option {
+  padding: 3px 0;
+  font-size: 14px;
+}
+#search02{
+	width:100%
+}
+.search-cell{
+	display: flex;
+	align-items: center;
+	height:100%;
+}	
+.employee-tr{
+	border-bottom:solid 2px #808080;
+	font-size: 15px;
+}
+.employee-list{
+	font-size: 15px;
+	color:#808080;
+}
+
+.butmod-hak1 button {
+	font-weight: bold;
+	margin:4px;
+	border: 2px solid gray;
+	border-radius: 4px;
+	text-align:center;
+}
+.butmod-hak2 button{
+	font-weight: bold;
+	margin: 2px;
+	border: 2px solid gray;
+	border-radius: 4px;
+	text-align: left;     
+}
+.custom_modal_right {
+	flex: 0 0 29%;
+    max-width: 29%;
+    }
+.custom_modal02{
+	width:90px;
+}
+.emp_photo{
+ position:absolute;
+ top: 15px;
+ right: 15px;
+ width:155px;
+ height:165px;
+ padding:0;
+}
+img{
+	width:100%;
+	height:auto;
+}
+
+.reg_photo_Btn{
+	height:	38px;
+	background-color: #808080;
+	color:white;
+	border-radius : 4px;
+	font-weight: bold;
+	flex: 0 0 20%;
+    max-width: 20%;
+    text-align:center;
+ 	line-height: 38px;	
+}
+.reg_photo, .authVal, .hide{
+	display:none;
+}
+.selectbox_custom01, .selectbox_custom02{
+    display: block;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #808080;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgb(222, 226, 230);
+    border-radius: .35rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out
+}
+
+.selectbox_custom01{
+	width: 22%;	
+	display: none;
+}
+.selectbox_custom02{
+    width: 76%;	
+}
+.selectbox_custom03{
+    display: block;
+    width: 56%;
+    height: calc(1.5em + .8rem + 2px);
+    padding: 0 .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #808080;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgb(222, 226, 230);
+    border-radius: 4px;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out
+}
+input[type='date'] {
+  position: relative; 
+  width: 100%;
+  border-radius: 4px;
+  color:#808080;
+}
+input[type='date']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+}
+#errorMsg01, #errorMsg02{
+	color: red;
+	margin: 10px 5px 0 0;
+	font-weight: bold;
+	font-size: 13px;
+}

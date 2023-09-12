@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.SaleHistoryDao">
+	<select id="stList" resultType="sh">
+		SELECT STORE_NUM ,STORE_NAME FROM STORE
+		WHERE STORE_NUM != 0
+	</select>
+	
+	<select id="prdListByStNum" resultType="sh" parameterType="int"> 
+		SELECT hop.*,ss.store_num,ss.storage_count cnt,ss.store_product_id FROM
+			(SELECT h.PRODUCT_NUM ,b.*,c.*,h.COST  
+			FROM HEAD_OFFICE_PRODUCT h,
+				(SELECT bi.ITEM_NUM,bi2.ITEM_NAME brand,bi.ITEM_NAME
+				FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+				WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+				(SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZE" 
+				FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+				WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+			WHERE h.ITEM_NUM = b.item_num
+			AND h.PROPERTIES_NUM = c.properties_num) hop,
+			store_storage ss
+		WHERE hop.product_num = ss.product_num
+		AND ss.store_num = #{store_num}
+	</select>
+	
+	<select id="schPrdByName" resultType="sh" parameterType="sh">
+		SELECT hop.*,ss.store_num,ss.storage_count cnt,ss.store_product_id FROM
+			(SELECT h.PRODUCT_NUM ,b.*,c.*,h.COST  
+			FROM HEAD_OFFICE_PRODUCT h,
+				(SELECT bi.ITEM_NUM,bi2.ITEM_NAME brand,bi.ITEM_NAME
+				FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+				WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+				(SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZE" 
+				FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+				WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+			WHERE h.ITEM_NUM = b.item_num
+			AND h.PROPERTIES_NUM = c.properties_num) hop,
+			store_storage ss
+		WHERE hop.product_num = ss.product_num
+		AND ss.store_num = #{store_num}
+		AND hop.item_name LIKE '%'||#{item_name}||'%'
+		AND ss.storage_count > 0
+		ORDER BY hop.item_num
+	</select>
+	
+	<insert id="insertSaleHistory" parameterType="regSH">
+		INSERT INTO SALE VALUES (sale_seq.nextVal,
+		#{store_product_ids},#{sale_date},#{sale_counts},#{total_prices})
+	</insert>
+	
+	<update id="updateStoreStorage" parameterType="regSH">
+		UPDATE STORE_STORAGE 
+					SET STORAGE_COUNT = STORAGE_COUNT - #{sale_counts}
+					WHERE store_num = #{store_num}
+					AND STORE_PRODUCT_ID = #{store_product_ids}
+	</update>
+</mapper>

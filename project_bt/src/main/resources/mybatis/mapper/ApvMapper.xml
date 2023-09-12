@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.erp.dao.ApvDao">
+	<resultMap type="apv" id="apvRst">
+		<result column="employee_name" property="approver"/>
+	</resultMap>
+	<select id="schOrderID" resultType="apv">
+		SELECT 
+			oe.order_id,
+		    h.PRODUCT_NUM,
+		    bb.ITEM_NAME AS brand,
+		    b.ITEM_NAME,
+		    pp.COLOR AS color,
+		    p.COLOR AS prd_size,
+		    S.STORE_NAME AS STORE
+		FROM ORDER_ERP oe 
+		JOIN HEAD_OFFICE_PRODUCT h ON oe.PRODUCT_NUM = h.PRODUCT_NUM 
+		JOIN BRAND_ITEM b ON h.ITEM_NUM = b.ITEM_NUM
+		JOIN PRODUCT_PROPERTIES p ON h.PROPERTIES_NUM = p.PROPERTIES_NUM
+		JOIN EMPLOYEE e ON OE.EMPLOYEE_NUM = E.EMPLOYEE_NUM 
+		JOIN STORE s ON E.STORE_NUM = S.STORE_NUM 
+		LEFT JOIN PRODUCT_PROPERTIES pp ON p.REF_NUM = pp.PROPERTIES_NUM
+		LEFT JOIN BRAND_ITEM bb ON b.REF_NUM = bb.ITEM_NUM
+		WHERE oe.ORDER_ID NOT IN (
+			SELECT a.order_id
+			FROM APPROVAL a 
+			JOIN ORDER_ERP oe2 ON a.ORDER_ID = oe2.ORDER_ID  
+		)
+		ORDER BY oe.ORDER_ID ASC
+	
+<!-- 		SELECT oe.order_id
+		FROM ORDER_ERP oe 
+		WHERE ORDER_ID NOT IN (
+			SELECT a.order_id
+			FROM APPROVAL a 
+			JOIN ORDER_ERP oe2 ON a.ORDER_ID = oe2.ORDER_ID  
+		)
+		ORDER BY oe.ORDER_ID desc -->
+	</select>
+	<select id="schApprover" resultMap="apvRst">
+		SELECT e.EMPLOYEE_NAME 
+		FROM employee e
+		WHERE JOB_LEVEL = '팀장'
+		order by employee_name desc
+	</select>
+	<insert id="apvIns" parameterType="apv">
+		INSERT INTO APPROVAL values('APV'||'-'||apv_seq.NEXTVAL,#{order_id},
+		#{approval_date},#{approval_type},#{drafter},#{approver},#{subject},#{contents},0)
+	</insert>
+	<select id="apvAll" resultType="apv" parameterType="schApv">
+		select * 
+		from (
+			select rownum cnt, a.* from (
+					select *
+					from approval
+					where subject like '%'||#{subject}||'%' 
+					order by approval_date desc
+			) a
+		)
+		where cnt between #{start} and #{end}
+		order by approval_date desc
+	</select>
+	<select id="apvList" resultType="apv" parameterType="schApv">
+		select * 
+		from (
+			select rownum cnt, a.* from (
+					select *
+					from approval
+					where subject like '%'||#{subject}||'%' 
+					and approval_status = 0
+					order by approval_date desc
+			) a
+		)
+		where cnt between #{start} and #{end}
+		order by approval_date desc
+	</select>
+	<select id="totApv" resultType="int" parameterType="schApv">
+		SELECT count(*) FROM approval
+		WHERE subject Like '%'||#{subject}||'%'
+		and approval_status = 0
+	</select>
+	<select id="totFil" resultType="int" parameterType="schApv">
+		SELECT count(*) FROM approval
+		WHERE subject Like '%'||#{subject}||'%'
+		and approval_status = #{num}
+	</select>
+	<select id="totAll" resultType="int" parameterType="schApv">
+		SELECT count(*) FROM approval
+		WHERE subject Like '%'||#{subject}||'%'
+	</select>
+	<select id="apvFilter" resultType="apv" parameterType="schApv">
+		select * 
+		from (
+			select rownum cnt, a.* from (
+					select *
+					from approval
+					where subject like '%'||#{subject}||'%' 
+					and approval_status = #{num}
+					order by approval_date desc
+			) a
+		)
+		where cnt between #{start} and #{end}
+		order by approval_date desc 
+	</select>
+	<select id="apvDetail" parameterType="string" resultType="apv">
+			select a.*, e.EMPLOYEE_NUM, e.EMPLOYEE_NAME  
+			from approval a
+			JOIN EMPLOYEE e ON a.DRAFTER = e.EMPLOYEE_NAME 
+			where approval_id = #{APPROVAL_ID} 
+	</select>
+	<update id="uptApvAgr" parameterType="string">
+		UPDATE APPROVAL 
+			SET APPROVAL_STATUS = 1
+			WHERE APPROVAL_ID = #{approval_id}
+	</update>
+	<update id="uptApvDeny" parameterType="string">
+		update approval
+			set approval_status = 2
+			where approval_id = #{approval_id}
+	</update>
+	<update id="uptApvCon" parameterType="apv">
+		update approval
+			set subject = #{subject},
+				contents = #{contents}
+		where approval_id = #{approval_id}					
+	</update>
+	<delete id="delApv" parameterType="apv">
+		delete 
+		from approval
+		where approval_id = #{approval_id}
+	</delete>
+	<update id="uptOrdAgr" parameterType="string">
+		update order_erp
+			set order_status = 1
+			where order_id = #{order_id}
+	</update>
+	<update id="uptOrdDeny" parameterType="string">
+		update order_erp
+			set order_status = 2
+			where order_id = #{order_id}
+	</update>
+	<insert id="insApvAgrStr" parameterType="string">
+		INSERT into store_storage (store_product_id,product_num,store_num,storage_count)
+		SELECT store_str.nextval,oe.PRODUCT_NUM,s.STORE_NUM, oe.ORDER_COUNT 
+		FROM ORDER_ERP oe 
+		JOIN EMPLOYEE e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM
+		JOIN STORE s ON e.STORE_NUM = s.STORE_NUM 
+		WHERE ORDER_ID = #{order_id}
+	</insert>
+	<select id="dupStr" parameterType="string" resultType="com.web.erp.vo.DupStr">
+		SELECT oe.product_num, s.STORE_NUM 
+		FROM ORDER_ERP oe 
+		JOIN EMPLOYEE e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM 
+		JOIN STORE s ON e.STORE_NUM = s.STORE_NUM 
+		WHERE order_id = #{order_id}
+		INTERSECT 
+		SELECT ss.PRODUCT_NUM , ss.STORE_NUM 
+		FROM STORE_STORAGE ss
+	</select>
+	<select id="ordCount" parameterType="string" resultType="int">
+		SELECT order_count 
+		FROM ORDER_ERP
+		WHERE order_id = #{ORDER_ID}
+	</select>
+	<select id="ssCount" parameterType="string" resultType="string">
+		SELECT storage_count
+		FROM STORE_STORAGE ss2 
+		WHERE ss2.PRODUCT_NUM =
+			(SELECT oe.product_num 
+			FROM ORDER_ERP oe 
+			JOIN EMPLOYEE e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM 
+			JOIN STORE s ON e.STORE_NUM = s.STORE_NUM 
+			WHERE order_id = #{order_id}
+			INTERSECT 
+			SELECT ss.PRODUCT_NUM 
+			FROM STORE_STORAGE ss)
+		AND ss2.STORE_NUM = 
+			(SELECT s.STORE_NUM 
+			FROM ORDER_ERP oe 
+			JOIN EMPLOYEE e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM 
+			JOIN STORE s ON e.STORE_NUM = s.STORE_NUM 
+			WHERE order_id = #{order_id}
+			INTERSECT 
+			SELECT ss.STORE_NUM 
+			FROM STORE_STORAGE ss)
+	</select>
+	<update id="ssUpt">
+	UPDATE STORE_STORAGE ss2
+		SET STORAGE_COUNT = #{count}
+	WHERE ss2.PRODUCT_NUM =
+		(SELECT oe.product_num 
+		FROM ORDER_ERP oe 
+		JOIN EMPLOYEE e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM 
+		JOIN STORE s ON e.STORE_NUM = s.STORE_NUM 
+		WHERE order_id = #{order_id}
+		INTERSECT 
+		SELECT ss.PRODUCT_NUM 
+		FROM STORE_STORAGE ss)
+		AND ss2.STORE_NUM = (
+			SELECT s.STORE_NUM 
+			FROM ORDER_ERP oe 
+			JOIN EMPLOYEE e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM 
+			JOIN STORE s ON e.STORE_NUM = s.STORE_NUM 
+			WHERE order_id = #{order_id}
+			INTERSECT 
+			SELECT ss.STORE_NUM 
+			FROM STORE_STORAGE ss
+		)
+	</update>
+	<select id="hopCount" parameterType="string" resultType="int">
+		SELECT hop.PRODUCT_COUNT 
+		FROM HEAD_OFFICE_PRODUCT hop 
+		JOIN ORDER_ERP oe ON hop.PRODUCT_NUM = oe.PRODUCT_NUM 
+		WHERE oe.ORDER_ID = #{order_id}
+	</select>
+	<update id="hopUpt">
+		UPDATE HEAD_OFFICE_PRODUCT hop
+			SET hop.PRODUCT_COUNT = #{count}
+		WHERE hop.PRODUCT_NUM = (
+			SELECT oe.PRODUCT_NUM  
+			FROM ORDER_ERP oe
+			WHERE oe.ORDER_ID = #{order_id}
+		)
+	</update>
+</mapper>		

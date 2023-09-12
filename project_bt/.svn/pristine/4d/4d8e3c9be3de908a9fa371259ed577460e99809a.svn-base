@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 선언된 Mapper.xml에서 member라는 이름으로 
+	해당 객체에 접근항 사용 가능하다. -->
+	<typeAliases>
+		<typeAlias alias="order" type="com.web.erp.vo.Order"/>
+		<typeAlias alias="employee" type="com.web.erp.vo.Employee"/>
+		<typeAlias alias="prm" type="com.web.erp.vo.Prm"/>
+		<typeAlias alias="prmsch" type="com.web.erp.vo.PrmSch"/>
+		<typeAlias alias="storeV" type="com.web.erp.vo.StoreVO"/>
+		<typeAlias alias="schStore" type="com.web.erp.vo.SchStore"/>
+		<typeAlias alias="schproperties" type="com.web.erp.vo.ProductProperties"/>
+		<typeAlias alias="schHead" type="com.web.erp.vo.SchPrd"/>
+		<typeAlias alias="schprd" type="com.web.erp.vo.SchPrd"/>
+		<typeAlias alias="delHeadPrd" type="com.web.erp.vo.HeadOfficeProduct"/>
+		<typeAlias alias="bi" type="com.web.erp.vo.BrandItem"/>
+		<typeAlias alias="sales" type="com.web.erp.vo.Sales"/>
+		<typeAlias alias="apv" type="com.web.erp.vo.Approval"/>
+		<typeAlias alias="hop" type="com.web.erp.vo.HeadOfficeProduct"/>
+		<typeAlias alias="salesDetail" type="com.web.erp.vo.SalesDetail"/>
+		<typeAlias alias="schApv" type="com.web.erp.vo.SchApv"/>
+		<typeAlias alias="salesByDay" type="com.web.erp.vo.SalesByDay"/>
+		<typeAlias alias="ss" type="com.web.erp.vo.StoreStorage"/>
+		<typeAlias alias="dbd" type="com.web.erp.vo.DashBoard"/>
+		<typeAlias alias="sh" type="com.web.erp.vo.SaleHistory"/>
+		<typeAlias alias="regSH" type="com.web.erp.vo.RegSaleHistory"/>
+	</typeAliases>
+</configuration>

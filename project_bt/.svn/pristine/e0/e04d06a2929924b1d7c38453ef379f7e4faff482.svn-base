@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.StoreDao">
+	<!-- 
+	<select id="allStoreInfo" resultType="storeV" parameterType="string">
+		SELECT * FROM store
+		WHERE STORE_NAME Like '%'||#{store_name}||'%'
+	</select>	 -->
+	
+	<select id="totStoreManage" resultType="int" parameterType="schStore">
+		SELECT count(*) FROM store
+		WHERE STORE_NAME Like '%'||#{store_name}||'%'
+	</select>
+	<select id="schStoreManage" resultType="storeV" parameterType="schStore">
+		SELECT * FROM
+			( SELECT rownum cnt, s.* from
+					( SELECT * 
+						FROM STORE
+						WHERE store_name LIKE '%'||#{store_name}||'%'
+						ORDER BY STORE_AREA desc
+					) s
+			)
+		WHERE cnt BETWEEN #{start} AND #{end}
+	</select>
+	<select id="storeEmpCnt" resultType="int" parameterType="int">
+		SELECT count(*) FROM STORE s, EMPLOYEE e 
+		WHERE s.STORE_NUM =e.STORE_NUM
+		AND s.STORE_NUM = #{store_num}
+	</select>
+	<select id="getStoreKeeper" resultType="string" parameterType="int">
+		SELECT EMPLOYEE_NAME FROM EMPLOYEE WHERE auth = 2
+		AND STORE_NUM = #{store_num}
+	</select>
+	<select id="getHOKeeper" resultType="string" parameterType="int">
+		SELECT EMPLOYEE_NAME FROM EMPLOYEE WHERE auth = 1
+	</select>
+	<select id="getStoreByNum" resultType="storeV" parameterType="int"> 
+		SELECT 
+			STORE_NUM,
+			STORE_NAME,
+			city,
+			REGION,
+			DETAIL_ADDRESS,
+			CONTACT ,
+			STORE_AREA ,
+			LATITUDE ,
+			LONGITUDE ,
+			to_char(REG_DATE,'YYYY-MM-DD') reg_date
+		 FROM store WHERE STORE_NUM = #{store_num}
+	</select>
+	<update id="uptStoreInfo" parameterType="storeV">
+		UPDATE STORE 
+			SET CITY = #{city},
+				REGION = #{region},
+				DETAIL_ADDRESS = #{detail_address},
+				CONTACT = #{contact},
+				STORE_AREA = #{store_area},
+				LATITUDE = #{latitude},
+				LONGITUDE = #{longitude}
+		WHERE STORE_NUM = #{store_num}
+	</update>
+	<delete id="delStoreInfo" parameterType="storeV"> 
+		DELETE store WHERE store_num = #{store_num}
+	</delete>
+</mapper>	

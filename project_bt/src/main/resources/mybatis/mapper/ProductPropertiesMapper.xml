@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >   
+<mapper namespace="com.web.erp.dao.ProductPropertiesDao">
+   <select id="schPer" resultType="schproperties" parameterType="int">
+	SELECT DISTINCT * FROM PRODUCT_PROPERTIES pp 
+	WHERE REF_NUM = 0
+   </select>
+   <select id="schPersize" resultType="schproperties" parameterType="int">
+	SELECT DISTINCT * FROM PRODUCT_PROPERTIES pp 
+	WHERE REF_NUM = #{ref_num} ORDER BY PROPERTIES_NUM ASC
+   </select>
+</mapper>

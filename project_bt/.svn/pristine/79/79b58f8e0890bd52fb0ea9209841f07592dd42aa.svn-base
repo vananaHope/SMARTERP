@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.OrderDao">
+	<resultMap type="com.web.erp.vo.OrderGantt" id="ordRst">
+ 		<result column="start_date" property="start"/>
+ 		<result column="end_date" property="end"/>
+ 		<result column="order_id" property="id"/>
+ 		<result column="store_name" property="name"/> 		
+ 	</resultMap>
+	<select id="schEmp" parameterType="string" resultType="order">
+		SELECT e.EMPLOYEE_NUM , e.EMPLOYEE_NAME, s.STORE_NAME 
+		FROM EMPLOYEE e, STORE s  
+		WHERE EMPLOYEE_NAME like '%'||#{employee_name}||'%'
+		AND e.STORE_NUM = s.STORE_NUM
+		and e.hire_type = '점포'
+		AND e.JOB_LEVEL IN ('점주','매니저')
+		order by s.store_name
+	</select>
+	<select id="schPrd" parameterType="string" resultType="schprd">
+		SELECT 
+		    h.PRODUCT_NUM,
+		    bb.ITEM_NAME AS brand,
+		    b.ITEM_NAME,
+		    pp.COLOR AS color,
+		    p.COLOR AS prd_size,
+		    h.COST,
+		    h.REG_DATE,
+		    h.PRODUCT_COUNT
+		FROM HEAD_OFFICE_PRODUCT h
+		JOIN BRAND_ITEM b ON h.ITEM_NUM = b.ITEM_NUM
+		JOIN PRODUCT_PROPERTIES p ON h.PROPERTIES_NUM = p.PROPERTIES_NUM
+		LEFT JOIN PRODUCT_PROPERTIES pp ON p.REF_NUM = pp.PROPERTIES_NUM
+		LEFT JOIN BRAND_ITEM bb ON b.REF_NUM = bb.ITEM_NUM 
+		WHERE (b.ITEM_NAME LIKE '%'||#{item_name}||'%' OR bb.ITEM_NAME LIKE '%'||#{item_name}||'%')
+		and h.product_count > 0
+		order by b.item_num, p.PROPERTIES_NUM asc
+	</select>
+	<insert id="insertOrder" parameterType="order">
+		INSERT INTO ORDER_ERP values(TO_CHAR(SYSDATE,'YYYY/MM/DD')||'-'||ORDER_seq.NEXTVAL, 
+		#{product_nums}, #{employee_num},#{start}, #{end}, #{order_counts}, 0)
+	</insert>
+	<select id="orderGan" resultMap="ordRst">
+		select ORDER_ID ,to_char(start_date,'YYYY-MM-DD') AS start_date, to_char(end_date,'YYYY-MM-DD') AS end_date, e.employee_name 
+		,s.store_name, oe.product_num ,bb.ITEM_NAME AS brand, b.ITEM_NAME, pp.COLOR AS color, p.COLOR AS prd_size, order_count ,order_status
+		from order_erp oe
+		JOIN employee e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM
+		JOIN store s ON e.STORE_NUM = s.STORE_NUM
+		JOIN HEAD_OFFICE_PRODUCT hop ON oe.PRODUCT_NUM = hop.PRODUCT_NUM
+		JOIN BRAND_ITEM b ON hop.ITEM_NUM = b.ITEM_NUM 
+		JOIN PRODUCT_PROPERTIES p ON hop.PROPERTIES_NUM = p.PROPERTIES_NUM
+		LEFT JOIN BRAND_ITEM bb ON b.REF_NUM = bb.ITEM_NUM  
+		LEFT JOIN PRODUCT_PROPERTIES pp ON p.REF_NUM = pp.PROPERTIES_NUM
+		order BY s.STORE_NAME,start_date
+	</select>
+	<update id="uptOrder" parameterType="com.web.erp.vo.OrderGantt">
+		UPDATE ORDER_ERP 
+			SET product_num = #{product_num},
+			start_date = #{start},
+			end_date = #{end},
+			order_count = #{order_count}
+		where order_id = #{id}	
+	</update>
+	<delete id="delOrder" parameterType="com.web.erp.vo.OrderGantt">
+		delete 
+		from order_erp
+		where order_id = #{id}
+	</delete>
+</mapper>	

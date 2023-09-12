@@ -1,0 +1,203 @@
+@charset "UTF-8";
+#map{
+	width:70%;
+	height: 400px;
+	margin: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	border: 3px solid #355CCC;
+	border-radius: 5px;
+}
+.row .mapBox{
+    position: relative;
+    width: 100%;
+    padding-right: .75rem;
+    padding-left: .75rem;
+	flex: auto;
+    max-width: 100%;
+    background-color: ghostwhite;
+}
+
+.row .dong-table{
+	margin: auto;
+}
+
+.row-dong{
+	width: 80%;
+	margin:auto;
+    padding-right: 4rem;
+    padding-left: 4rem;
+}
+.tab-dong{
+	width: 100%;
+	color: black;
+	border-collapse: collapse;
+	flex: auto;
+}
+.tab-dong th {
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+}
+.tab-dong td {
+    padding-top: 20px;
+    font-size: 15px;
+    text-align: center;
+}
+.tab-dong .bottLine{
+	border-bottom: 2px solid gray;
+}
+.tab-dong .resetSch{
+	margin: 7px 0px 8px 0px;
+	padding: 0 3% 0 3%;
+	display: inline-block;
+}
+.tab-dong .search{
+	width: 80%;
+	height: 100%;
+	border: 2px solid lightgray;
+	border-radius: 7px;
+	margin: 5px 0px 8px 0px;
+	text-align: right;
+	padding-right: 20px;
+	float: right;
+}
+.tab-dong select{
+	width: 50%;
+	border: 2px solid gray;
+	border-radius: 7px;
+	margin: 2px 5px 2px 5px;
+	text-align: center;
+	float: right;
+}
+.btnArea-dong{
+	text-align: right;
+}
+.tab-dong .btn{
+	padding: 0.375rem 2rem;
+	margin: 0 0.75rem 0.25rem 0;
+	width:60%;
+	font-weight: bold;
+	float:right;
+}
+#stManageModal #mapUptBtn{
+	padding: 0.375rem 2rem;
+	font-weight: bold;
+	float: right;
+	margin: 0 10px 10px 0;
+	width: 30%;
+}
+#stManageModal .btn{
+	padding: 0.375rem 2rem;
+	font-weight: bold;
+}
+#stManageModal span{
+	width: 120px;
+}
+#stFrm input.error{
+	border: 2px solid red;
+	width: 60%;
+	border-radius: 0 5px 5px 0;
+}
+#stFrm input.error{
+	border: 2px solid red;
+	width: 60%;
+	border-radius: 0 5px 5px 0;
+}
+#stManageModal #errorMsg{
+	display: inline-block;
+	color: red;
+	margin: 10px 5px 0 0;
+	font-weight: bold;
+	font-size: 13px;
+}
+#stManageModal .errorMsg{
+	display: inline-block;
+	color: red;
+	margin: 10px 5px 0 0;
+	font-weight: bold;
+	font-size: 13px;
+}
+.row select[name=pageSize]{
+	width:10%;
+	float: left;
+	margin-left:10px;
+	border: 3px solid #4e73df;
+	text-align: center;
+}
+div.paging{
+	margin-top: 5px;
+}
+.disabled-link {
+    pointer-events: none;
+    color: gray;
+    text-decoration: none;
+    cursor: not-allowed;
+}
+h4.modal-stName{
+	margin: 1px 0 0 20px;
+	font-weight: bold;
+}
+h6.modal-totSale{
+	margin: 1px 0 0 20px;
+	font-weight: bold;
+	border: 2px solid #4e73df;
+	padding: 0 6px 0 6px;
+}
+/* DashBoard */
+.tab-dong-dbd{
+	width: 100%;
+	color: black;
+	border-collapse: collapse;
+	flex: auto;
+	border: 2px solid lightgray;
+}
+.tab-dong-dbd th {
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	padding: 10px;
+	background-color: #F8F9FC;
+	border: 2px solid lightgray;
+}
+.tab-dong-dbd td {
+    padding: 13px 0;
+    font-size: 16px;
+    text-align: center;
+    border-top: 1px solid lightgray;
+}
+.tab-dong-dbd .search{
+	width: 90%;
+	height: 100%;
+	border: 2px solid grey;
+	border-radius: 4px;
+	margin: 2px 10px 2px 0px;
+	text-align: right;
+	padding-right: 20px;
+	float: right;
+}
+.tab-dong-dbd-order{
+	width: 100%;
+	color: black;
+	border-collapse: collapse;
+	flex: auto;
+}
+.tab-dong-dbd-order th {
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	padding: 10px;
+	background-color: #F8F9FC;
+	border-bottom: 3px solid lightgray;
+	position: sticky;
+	top:0;
+}
+.tab-dong-dbd-order td {
+    padding: 13px 0;
+    font-size: 16px;
+    text-align: center;
+    border-top: 1px solid lightgray;
+}
+.tab-dong-dbd-order tbody {
+    height: 265px;
+}

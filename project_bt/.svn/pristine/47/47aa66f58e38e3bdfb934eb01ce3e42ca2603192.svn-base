@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >   
+<mapper namespace="com.web.erp.dao.HeadOfficeProductDao">
+<!-- 본사에 등록된 상품 조회 -->
+   <select id="schHeadPrd" resultType = "schprd" parameterType="string">
+		SELECT 
+		    h.PRODUCT_NUM,
+		    bb.ITEM_NAME AS brand,
+		    b.ITEM_NAME,
+		    pp.COLOR AS color,
+		    p.COLOR AS prd_size,
+		    h.COST,
+		    h.REG_DATE,
+		    h.PRODUCT_COUNT,
+		    p.PROPERTIES_NUM,
+		    b.ITEM_NUM
+		FROM HEAD_OFFICE_PRODUCT h
+		JOIN BRAND_ITEM b ON h.ITEM_NUM = b.ITEM_NUM
+		JOIN PRODUCT_PROPERTIES p ON h.PROPERTIES_NUM = p.PROPERTIES_NUM
+		LEFT JOIN PRODUCT_PROPERTIES pp ON p.REF_NUM = pp.PROPERTIES_NUM
+		LEFT JOIN BRAND_ITEM bb ON b.REF_NUM = bb.ITEM_NUM 
+		WHERE b.ITEM_NAME like '%'||#{item_name}||'%' ORDER BY PRODUCT_NUM ASC
+   </select>
+   
+<!-- 본사에 등록된 상품 삭제 -->
+<delete id="delHeadPrd" parameterType="int">
+    DELETE FROM HEAD_OFFICE_PRODUCT
+    WHERE PRODUCT_NUM = #{product_num}
+</delete>
+
+<!-- 본사에 새로운 상품 등록 -->
+<insert id="insHeadPrd"  parameterType = "hop">
+    INSERT INTO HEAD_OFFICE_PRODUCT (PRODUCT_NUM, PROPERTIES_NUM, ITEM_NUM, COST, REG_DATE, PRODUCT_COUNT)
+    VALUES (product_num_seq.nextval, #{properties_nums}, #{item_num}, #{cost}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), 0)
+</insert>
+
+
+<update id = "uptHeadPrd" parameterType = "hop">
+	UPDATE HEAD_OFFICE_PRODUCT SET PRODUCT_COUNT = #{product_count} WHERE PRODUCT_NUM = #{product_num}
+</update>
+
+
+<!--
+<update id="uptHeadPrd" parameterType="hop">
+    <foreach collection="product_nums" item="product_num" index="index" open="" separator="" close="">
+        UPDATE HEAD_OFFICE_PRODUCT SET PRODUCT_COUNT = #{counts[${index}]} WHERE PRODUCT_NUM = #{product_num}
+    </foreach>
+</update>
+-->
+
+
+</mapper>

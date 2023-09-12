@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.DashBoardDao">
+	<select id="empCnt" resultType="int">
+		SELECT count(*) emp FROM EMPLOYEE e
+	</select>
+	
+	<select id="storeCnt" resultType="int">
+		SELECT count(*) store FROM STORE s
+	</select>
+	
+	<select id="brandCnt" resultType="int">
+		SELECT count(DISTINCT (b.brand)) brand  
+		FROM HEAD_OFFICE_PRODUCT h,
+			(SELECT bi.ITEM_NUM,bi2.ITEM_NAME brand,bi.ITEM_NAME
+			FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+			WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+			(SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZE" 
+			FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+			WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+		WHERE h.ITEM_NUM = b.item_num
+		AND h.PROPERTIES_NUM = c.properties_num
+	</select>
+	
+	<select id="itemCnt" resultType="int">
+		SELECT count(DISTINCT b.item_name) item  
+		FROM HEAD_OFFICE_PRODUCT h,
+			(SELECT bi.ITEM_NUM,bi2.ITEM_NAME brand,bi.ITEM_NAME
+			FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+			WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+			(SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZE" 
+			FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+			WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+		WHERE h.ITEM_NUM = b.item_num
+		AND h.PROPERTIES_NUM = c.properties_num
+	</select>
+	
+	<select id="saleCntByBrand" resultType="dbd">
+		SELECT * FROM
+		(SELECT h.brand,sum(s.SALE_COUNT) "SALE_CNT"
+		FROM SALE s,STORE_STORAGE ss,
+				(
+					SELECT h.PRODUCT_NUM,b.brand  
+					FROM HEAD_OFFICE_PRODUCT h,
+						(SELECT bi.ITEM_NUM,bi2.ITEM_NAME brand,bi.ITEM_NAME
+						FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+						WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+						(SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZE" 
+						FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+						WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+					WHERE h.ITEM_NUM = b.item_num
+					AND h.PROPERTIES_NUM = c.properties_num
+				)	h
+		WHERE ss.PRODUCT_NUM = h.product_num
+		AND s.STORE_PRODUCT_ID = ss.STORE_PRODUCT_ID
+		GROUP BY h.brand
+		ORDER BY h.brand)
+	</select>
+	
+	<select id="totSaleByMonth" resultType="dbd">
+		SELECT SALE_DATE, sum(TOT_PRICE) TOTAL_PRICE 
+		FROM
+			(SELECT to_char(sale_date,'YYYY-MM') SALE_DATE , sum(TOTAL_PRICE) tot_price 
+			FROM SALE s
+			GROUP BY sale_date
+			ORDER BY SALE_DATE)
+		WHERE SALE_DATE &gt;= to_char(ADD_MONTHS(sysdate, -12), 'YYYY-MM')
+		GROUP BY SALE_DATE
+		ORDER BY SALE_DATE
+	</select>
+	
+	<select id="totSaleByStore" resultType="dbd">
+		SELECT s2.STORE_NAME,sum(s.TOTAL_PRICE) total_price
+		FROM sale s, STORE_STORAGE ss ,STORE s2
+		WHERE s.STORE_PRODUCT_ID = ss.STORE_PRODUCT_ID
+		AND ss.STORE_NUM = s2.STORE_NUM
+		AND to_char(s.SALE_DATE,'YYYY') = to_char(sysdate,'YYYY')
+		GROUP BY s2.STORE_NAME
+		ORDER BY TOTAL_PRICE desc
+	</select>
+	
+	<select id="orderEndDateDesc" resultType="dbd">
+		SELECT * FROM(
+			SELECT rownum cnt, o.* from
+				(SELECT to_char(end_date,'YYYY-MM-DD') AS end_date, s.store_name, b.ITEM_NAME, pp.COLOR AS color, p.COLOR AS "SIZE"
+				from order_erp oe
+				JOIN employee e ON oe.EMPLOYEE_NUM = e.EMPLOYEE_NUM 
+				JOIN store s ON e.STORE_NUM = s.STORE_NUM
+				JOIN HEAD_OFFICE_PRODUCT hop ON oe.PRODUCT_NUM = hop.PRODUCT_NUM
+				JOIN BRAND_ITEM b ON hop.ITEM_NUM = b.ITEM_NUM 
+				JOIN PRODUCT_PROPERTIES p ON hop.PROPERTIES_NUM = p.PROPERTIES_NUM
+				LEFT JOIN BRAND_ITEM bb ON b.REF_NUM = bb.ITEM_NUM  
+				LEFT JOIN PRODUCT_PROPERTIES pp ON p.REF_NUM = pp.PROPERTIES_NUM
+				WHERE order_status = 0
+				order by end_date asc) o)
+	</select>
+	
+	<select id="brandByBrandNum" parameterType="String" resultType="dbd">
+		SELECT b.ref_num brand_num,b.brand, COUNT(b.brand) cnt
+		FROM HEAD_OFFICE_PRODUCT h,
+			(SELECT bi.ref_num,bi2.ITEM_NAME brand,bi.ITEM_NAME,bi.item_num
+			FROM BRAND_ITEM bi,BRAND_ITEM bi2  
+			WHERE bi.REF_NUM = bi2.ITEM_NUM) b,
+			(SELECT pp.PROPERTIES_NUM,pp2.COLOR color,pp.COLOR "SIZE" 
+			FROM PRODUCT_PROPERTIES pp, PRODUCT_PROPERTIES pp2
+			WHERE pp.REF_NUM =pp2.PROPERTIES_NUM) c
+		WHERE h.ITEM_NUM = b.item_num
+		AND h.PROPERTIES_NUM = c.properties_num
+		AND b.brand LIKE '%'||#{brand}||'%'
+		GROUP BY b.brand, b.ref_num
+		ORDER BY brand_num
+	</select>
+</mapper>

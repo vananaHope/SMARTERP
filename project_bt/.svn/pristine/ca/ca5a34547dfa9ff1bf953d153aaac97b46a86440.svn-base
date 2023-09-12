@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+<mapper namespace="com.web.erp.dao.SessionDao">
+
+	<!--
+ 	<select id="sessionEmp" parameterType="string" resultType="employee">
+		SELECT employee_name, job_level, auth
+		FROM employee 
+		WHERE id= #{id} AND password = #{password}
+	</select> -->
+	
+	
+	<select id="sessionEmp" parameterType="string" resultType="employee">
+		SELECT employee_num, employee_name, job_level, auth, s.STORE_NAME  
+		FROM EMPLOYEE e,STORE s  
+		WHERE e.STORE_NUM =s.STORE_NUM
+		AND id = #{id} AND PASSWORD = #{password}
+	</select>	
+	<select id="findId" parameterType="string" resultType="employee">
+		SELECT id, password, employee_num, employee_name, job_level, hire_type, auth, s.STORE_NAME, e.store_num  
+		FROM EMPLOYEE e,STORE s  
+		WHERE e.STORE_NUM =s.STORE_NUM
+		AND id = #{username}
+	</select>
+</mapper>	
